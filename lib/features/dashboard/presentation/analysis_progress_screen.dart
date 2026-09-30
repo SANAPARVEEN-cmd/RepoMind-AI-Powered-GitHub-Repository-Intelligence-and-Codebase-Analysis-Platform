@@ -11,8 +11,9 @@ class AnalysisProgressScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uri = Uri.parse(repositoryUrl);
-    final repositoryName = uri.pathSegments.length >= 2
+    final uri = Uri.tryParse(repositoryUrl);
+
+    final repositoryName = uri != null && uri.pathSegments.length >= 2
         ? '${uri.pathSegments[0]}/${uri.pathSegments[1]}'
         : 'GitHub Repository';
 
@@ -122,6 +123,41 @@ class AnalysisProgressScreen extends StatelessWidget {
                 ),
               ),
             ),
+
+            const SizedBox(height: 24),
+
+            SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: () {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RepositoryOverviewScreen(
+                        repositoryUrl: repositoryUrl,
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.analytics_outlined),
+                label: const Text('View Repository Overview'),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                icon: const Icon(Icons.arrow_back_rounded),
+                label: const Text('Back to Dashboard'),
+              ),
+            ),
+
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -137,7 +173,9 @@ class AnalysisProgressScreen extends StatelessWidget {
             icon,
             color: completed ? AppColors.success : AppColors.textMuted,
           ),
+
           const SizedBox(width: 12),
+
           Expanded(
             child: Text(
               title,
@@ -149,6 +187,7 @@ class AnalysisProgressScreen extends StatelessWidget {
               ),
             ),
           ),
+
           if (completed)
             const Icon(Icons.check, color: AppColors.success, size: 18),
         ],
