@@ -16,8 +16,6 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
 
-  final List<String> _titles = ['Home', 'History', 'Profile'];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,29 +65,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _buildHome() {
     return CustomScrollView(
+      physics: const BouncingScrollPhysics(),
       slivers: [
         SliverPadding(
-          padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
           sliver: SliverList(
             delegate: SliverChildListDelegate([
               const DashboardHeader(),
 
-              const SizedBox(height: 28),
+              const SizedBox(height: 26),
+
+              _buildArchitectureRadar(),
+
+              const SizedBox(height: 24),
 
               const RepositoryInputCard(),
 
-              const SizedBox(height: 28),
+              const SizedBox(height: 30),
 
-              const Text(
+              _buildSectionTitle(
                 'Your Workspace',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                ),
+                'A snapshot of your activity',
               ),
 
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
 
               const Row(
                 children: [
@@ -113,18 +112,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
               ),
 
-              const SizedBox(height: 28),
+              const SizedBox(height: 30),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  _buildSectionTitle(
                     'Recent Analyses',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                    ),
+                    'Your recently explored codebases',
                   ),
                   TextButton(
                     onPressed: () {
@@ -137,7 +132,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
               ),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 14),
 
               const RecentRepositoryCard(
                 name: 'RepoMind',
@@ -159,6 +154,146 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 20),
             ]),
           ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildArchitectureRadar() {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.radar_rounded,
+                  color: AppColors.primaryLight,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'REPOMIND INTELLIGENCE',
+                      style: TextStyle(
+                        color: AppColors.textMuted,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.2,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Architecture Radar',
+                      style: TextStyle(
+                        color: AppColors.textPrimary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.auto_awesome_outlined,
+                color: AppColors.primaryLight,
+                size: 20,
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 18),
+
+          const Text(
+            'See beyond the code.',
+            style: TextStyle(
+              color: AppColors.textPrimary,
+              fontSize: 21,
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.5,
+            ),
+          ),
+
+          const SizedBox(height: 8),
+
+          const Text(
+            'Explore repository structure, technologies, '
+            'code health, and architectural insights in one place.',
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 13,
+              height: 1.6,
+            ),
+          ),
+
+          const SizedBox(height: 18),
+
+          Row(
+            children: [
+              _buildRadarFeature(Icons.account_tree_outlined, 'Structure'),
+              const SizedBox(width: 16),
+              _buildRadarFeature(Icons.monitor_heart_outlined, 'Code health'),
+              const SizedBox(width: 16),
+              _buildRadarFeature(Icons.psychology_outlined, 'AI insights'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRadarFeature(IconData icon, String label) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 17, color: AppColors.primaryLight),
+          const SizedBox(height: 7),
+          Text(
+            label,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 10,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title, String subtitle) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          subtitle,
+          style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
         ),
       ],
     );

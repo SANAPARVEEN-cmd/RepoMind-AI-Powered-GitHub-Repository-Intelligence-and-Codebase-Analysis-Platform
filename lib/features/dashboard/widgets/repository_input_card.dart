@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/constants/app_colors.dart';
 import '../../dashboard/presentation/analysis_progress_screen.dart';
 
 class RepositoryInputCard extends StatefulWidget {
@@ -25,8 +26,9 @@ class _RepositoryInputCardState extends State<RepositoryInputCard> {
 
     if (uri == null) return false;
 
-    final isGitHubHost =
-        uri.host == 'github.com' || uri.host == 'www.github.com';
+    final host = uri.host.toLowerCase();
+
+    final isGitHubHost = host == 'github.com' || host == 'www.github.com';
 
     final hasRepositoryPath =
         uri.pathSegments.length >= 2 &&
@@ -35,10 +37,13 @@ class _RepositoryInputCardState extends State<RepositoryInputCard> {
 
     return (uri.scheme == 'https' || uri.scheme == 'http') &&
         isGitHubHost &&
+        uri.userInfo.isEmpty &&
         hasRepositoryPath;
   }
 
   Future<void> _analyzeRepository() async {
+    if (_isLoading) return;
+
     final url = _urlController.text.trim();
 
     if (url.isEmpty) {
@@ -47,10 +52,7 @@ class _RepositoryInputCardState extends State<RepositoryInputCard> {
     }
 
     if (!_isValidGitHubUrl(url)) {
-      _showMessage(
-        'Enter a valid GitHub repository URL, '
-        'for example: https://github.com/flutter/flutter',
-      );
+      _showMessage('Please enter a valid GitHub repository URL.');
       return;
     }
 
@@ -58,8 +60,8 @@ class _RepositoryInputCardState extends State<RepositoryInputCard> {
       _isLoading = true;
     });
 
-    // Small delay for visual feedback during this UI prototype.
-    await Future.delayed(const Duration(milliseconds: 250));
+    // Temporary delay for UI prototype.
+    await Future.delayed(const Duration(milliseconds: 500));
 
     if (!mounted) return;
 
@@ -85,53 +87,55 @@ class _RepositoryInputCardState extends State<RepositoryInputCard> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: theme.cardTheme.color ?? const Color(0xFF151B2E),
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+        border: Border.all(color: AppColors.border),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Card heading
           Row(
             children: [
               Container(
                 width: 42,
                 height: 42,
                 decoration: BoxDecoration(
-                  color: colorScheme.primary.withValues(alpha: 0.15),
+                  color: AppColors.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(
-                  Icons.auto_awesome_rounded,
-                  color: colorScheme.primary,
-                  size: 22,
+                child: const Icon(
+                  Icons.code_rounded,
+                  color: AppColors.primaryLight,
+                  size: 23,
                 ),
               ),
+
               const SizedBox(width: 12),
-              Expanded(
+
+              const Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'Analyze a Repository',
-                      style: theme.textTheme.titleMedium?.copyWith(
+                      style: TextStyle(
+                        fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 5),
                     Text(
-                      'Paste a public GitHub repository URL to get started.',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.60),
+                      'Start exploring any public GitHub repository.',
+                      style: TextStyle(
+                        fontSize: 11,
                         height: 1.4,
+                        color: AppColors.textSecondary,
                       ),
                     ),
                   ],
@@ -142,49 +146,67 @@ class _RepositoryInputCardState extends State<RepositoryInputCard> {
 
           const SizedBox(height: 22),
 
+          // Input label
+          const Text(
+            'GITHUB REPOSITORY URL',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1,
+              color: AppColors.textSecondary,
+            ),
+          ),
+
+          const SizedBox(height: 9),
+
+          // GitHub URL input
           TextField(
             controller: _urlController,
             keyboardType: TextInputType.url,
             textInputAction: TextInputAction.go,
             onSubmitted: (_) => _analyzeRepository(),
-            style: const TextStyle(color: Colors.white, fontSize: 14),
+            style: const TextStyle(color: AppColors.textPrimary, fontSize: 13),
             decoration: InputDecoration(
-              hintText: 'https://github.com/username/repository',
-              hintStyle: TextStyle(
-                color: Colors.white.withValues(alpha: 0.35),
-                fontSize: 13,
+              hintText: 'https://github.com/owner/repository',
+              hintStyle: const TextStyle(
+                color: AppColors.textMuted,
+                fontSize: 12,
               ),
-              prefixIcon: Icon(
+              prefixIcon: const Icon(
                 Icons.link_rounded,
-                color: Colors.white.withValues(alpha: 0.55),
+                color: AppColors.textSecondary,
+                size: 20,
+              ),
+              suffixIcon: ValueListenableBuilder<TextEditingValue>(
+                valueListenable: _urlController,
+                builder: (context, value, child) {
+                  if (value.text.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+
+                  return IconButton(
+                    tooltip: 'Clear URL',
+                    onPressed: _isLoading ? null : () => _urlController.clear(),
+                    icon: const Icon(
+                      Icons.close_rounded,
+                      size: 18,
+                      color: AppColors.textMuted,
+                    ),
+                  );
+                },
               ),
               filled: true,
-              fillColor: const Color(0xFF0D1324),
+              fillColor: AppColors.surfaceInput,
               contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 17,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(13),
-                borderSide: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.08),
-                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(13),
-                borderSide: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.08),
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(13),
-                borderSide: BorderSide(color: colorScheme.primary, width: 1.4),
+                horizontal: 14,
+                vertical: 16,
               ),
             ),
           ),
 
-          const SizedBox(height: 14),
+          const SizedBox(height: 15),
 
+          // Analyze button
           SizedBox(
             width: double.infinity,
             height: 50,
@@ -199,43 +221,37 @@ class _RepositoryInputCardState extends State<RepositoryInputCard> {
                         color: Colors.white,
                       ),
                     )
-                  : const Icon(Icons.bolt_rounded, size: 20),
+                  : const Icon(Icons.arrow_forward_rounded, size: 19),
               label: Text(
                 _isLoading ? 'Preparing analysis...' : 'Analyze Repository',
                 style: const TextStyle(
-                  fontWeight: FontWeight.w600,
                   fontSize: 14,
-                ),
-              ),
-              style: FilledButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-                foregroundColor: Colors.white,
-                disabledBackgroundColor: colorScheme.primary.withValues(
-                  alpha: 0.55,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(13),
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
 
+          // Privacy and prototype information
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(
-                Icons.lock_outline_rounded,
+              const Icon(
+                Icons.info_outline_rounded,
                 size: 14,
-                color: Colors.white.withValues(alpha: 0.45),
+                color: AppColors.textMuted,
               ),
-              const SizedBox(width: 6),
-              Expanded(
+              const SizedBox(width: 7),
+              const Expanded(
                 child: Text(
-                  'UI prototype: repository analysis is not connected yet.',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: Colors.white.withValues(alpha: 0.45),
-                    fontSize: 11,
+                  'Prototype mode: actual repository analysis '
+                  'will be connected through the backend.',
+                  style: TextStyle(
+                    fontSize: 10,
+                    height: 1.5,
+                    color: AppColors.textMuted,
                   ),
                 ),
               ),

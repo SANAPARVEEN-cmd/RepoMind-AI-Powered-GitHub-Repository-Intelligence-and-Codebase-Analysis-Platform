@@ -9,22 +9,27 @@ class DashboardHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
+        // RepoMind brand icon
         Container(
-          width: 44,
-          height: 44,
+          width: 46,
+          height: 46,
           decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.13),
             borderRadius: BorderRadius.circular(14),
-            gradient: const LinearGradient(
-              colors: [AppColors.primary, AppColors.primaryDark],
+            border: Border.all(
+              color: AppColors.primary.withValues(alpha: 0.25),
             ),
           ),
           child: const Icon(
             Icons.psychology_alt_rounded,
-            color: Colors.white,
-            size: 25,
+            color: AppColors.primaryLight,
+            size: 26,
           ),
         ),
+
         const SizedBox(width: 12),
+
+        // Brand name and subtitle
         const Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,27 +39,75 @@ class DashboardHeader extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 21,
                   fontWeight: FontWeight.w800,
-                  letterSpacing: -0.5,
+                  letterSpacing: -0.7,
                   color: AppColors.textPrimary,
                 ),
               ),
+              SizedBox(height: 3),
               Text(
-                'Your codebase intelligence hub',
-                style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                'Codebase intelligence platform',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textSecondary,
+                ),
               ),
             ],
           ),
         ),
+
+        // System status
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: AppColors.border),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 6,
+                height: 6,
+                decoration: const BoxDecoration(
+                  color: AppColors.success,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 6),
+              const Text(
+                'Ready',
+                style: TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(width: 8),
+
+        // Notifications
         IconButton(
-          onPressed: () {},
+          tooltip: 'Notifications',
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Notifications will be available soon.'),
+              ),
+            );
+          },
           style: IconButton.styleFrom(
             backgroundColor: AppColors.surface,
+            foregroundColor: AppColors.textPrimary,
             side: const BorderSide(color: AppColors.border),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(13),
+            ),
           ),
-          icon: const Icon(
-            Icons.notifications_none_rounded,
-            color: AppColors.textPrimary,
-          ),
+          icon: const Icon(Icons.notifications_none_rounded, size: 21),
         ),
       ],
     );
