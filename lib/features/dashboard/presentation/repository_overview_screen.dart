@@ -2,6 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../dashboard/presentation/repository_structure_tab.dart';
+import '../../dashboard/presentation/code_health_analysis_section.dart';
+import '../../dashboard/presentation/technical_debt_analysis_section.dart';
+
+import '../../dashboard/presentation/architecture_analysis_section.dart';
+import '../../dashboard/presentation/ai_repository_insights_section.dart';
+import '../../dashboard/presentation/readme_generator_section.dart';
+import '../../dashboard/presentation/documentation_screen.dart';
 
 class RepositoryOverviewScreen extends StatefulWidget {
   final String repositoryUrl;
@@ -146,7 +154,9 @@ class _RepositoryOverviewScreenState extends State<RepositoryOverviewScreen>
           controller: _tabController,
           children: [
             _buildResponsivePage(_buildOverviewTab()),
-            _buildResponsivePage(_FilesTab()),
+            _buildResponsivePage(
+              RepositoryStructureTab(repositoryName: repositoryName),
+            ),
             _buildResponsivePage(_InsightsTab()),
           ],
         ),
@@ -163,6 +173,10 @@ class _RepositoryOverviewScreenState extends State<RepositoryOverviewScreen>
       padding: const EdgeInsets.all(18),
       children: [
         _buildRepositoryHeader(),
+
+        const SizedBox(height: 16),
+
+        _buildDocumentationButton(),
 
         const SizedBox(height: 24),
 
@@ -434,6 +448,75 @@ class _RepositoryOverviewScreenState extends State<RepositoryOverviewScreen>
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDocumentationButton() {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                DocumentationScreen(repositoryName: repositoryName),
+          ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(11),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.13),
+                borderRadius: BorderRadius.circular(11),
+              ),
+              child: const Icon(
+                Icons.menu_book_rounded,
+                color: AppColors.primaryLight,
+                size: 23,
+              ),
+            ),
+            const SizedBox(width: 14),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Repository Documentation',
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    'Explore README, code documentation and architecture.',
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 11,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: AppColors.textMuted,
+              size: 15,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -996,7 +1079,9 @@ class _InsightsTab extends StatelessWidget {
             ],
           ),
         ),
+        const CodeHealthAnalysisSection(),
 
+        const SizedBox(height: 28),
         const SizedBox(height: 24),
 
         const Text(
@@ -1016,6 +1101,11 @@ class _InsightsTab extends StatelessWidget {
             child: _InsightTile(insight: insight),
           );
         }),
+        const TechnicalDebtAnalysisSection(),
+        const ArchitectureAnalysisSection(),
+        const AiRepositoryInsightsSection(),
+        const SizedBox(height: 28),
+        const ReadmeGeneratorSection(),
       ],
     );
   }
